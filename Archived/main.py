@@ -1,5 +1,5 @@
 import os, io, pickle
-import getDiff
+import Archived.getDiff as getDiff
 from google.cloud import vision
 
 # used to filter text_data list to find song title easier
@@ -8,6 +8,29 @@ ignoredWords = ['ch4rley', 'beginner', 'my', 'best', 'machine', 'best', 'feel', 
 'usb', 'port', 'game', 'option', 'command', 'full', 'mode', 'perfect', 'great', 'good', 'bad', 'miss', 'max', 'combo', 
 'total', 'score', 'calorie', '(', 'kcal', ')', 'd', 'm', 'song', 'by', 'yak', 'wan', 'credit', '(', 's', ')', '0', 
 '[', '0/1', ']', 'notice', 'kronyork', 'lx', 'roamiro', 'ext', 'mach', 'piu', 'andamiro', 'mach', 'generation']
+
+# gets grade rank (A, S, SS, etc.) from text_data **should try to replace this method if i ever think of something better**
+def getRank(text_data):
+    letterCount = {'f': 0, 'd': 0, 'c': 0, 'b': 0, 'a': 0, 's': 0, 'ss': 0, 'sss': 0}
+    for output in text_data:
+        if output == 'f':
+            letterCount['f'] += 1
+        elif output == 'd':
+            letterCount['d'] += 1
+        elif output == 'c':
+            letterCount['c'] += 1
+        elif output == 'b':
+            letterCount['b'] += 1
+        elif output == 'a':
+            letterCount['a'] += 1
+        elif output == 's':
+            letterCount['s'] += 1
+        elif output == 'ss':
+            letterCount['ss'] += 1
+        elif output == 'sss':
+            letterCount['sss'] += 1
+
+    return max(letterCount, key=letterCount.get)
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "bold-kit-371901-7d62ca675d64.json"
 
@@ -33,6 +56,8 @@ response = client.text_detection(image=image)
 text_data = []
 judges = {}
 score = 0
+
+rightOrLeft = int(input("Are scores on right side of left side of screen? (0 for L/1 for R): "))
 
 i = 0
 for word in response.text_annotations:

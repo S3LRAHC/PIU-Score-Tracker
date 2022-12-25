@@ -27,7 +27,7 @@ client = vision.ImageAnnotatorClient()
 # just testing the API right now. 
 # once i want to start accounting for pictures I take, 
 # I would have to incorporate a loop here to iterate through my picture file names
-FILE_NAME = "test_image5.jpeg"
+FILE_NAME = "breakOff3.jpeg"
 # r is put before path as 'raw', so backslashes aren't seen as special characters
 FOLDER_PATH = r"C:\Users\Charles\Documents\GitHub\PIU-Score-Tracker\pictures"
 
@@ -124,6 +124,30 @@ for title in allTitles:
     if all(elem in text_data for elem in title):
         songTitle = " ".join(title)
 
+# gathering RGB information of dominant colours
+colour_data = []
+response_image = client.image_properties(image=image)
+for i in response_image.image_properties_annotation.dominant_colors.colors:
+    colours = str(i.color)
+    rgbList = colours.splitlines()
+    for x in range(3):
+        colonIndex = rgbList[x].rfind(':')
+        rgbList[x] = int(rgbList[x][colonIndex + 2:])
+    colour_data.append(rgbList)
+print(colour_data)
+
+# checking precense of gray A colour (stage passed or failed)
+grayPresent = False
+rValue = 90
+gValue = 130
+bValue = 170
+for i in range(len(colour_data)):
+    if colour_data[i][0] > rValue and colour_data[i][1] > gValue and colour_data[i][2] > bValue:
+        grayPresent = True
+passOrFail = ""
+if grayPresent == True:
+    passOrFail = "-"
+
 # PRINT ALL RELEVANT INFORMATION BELOW
 
 if songTitle == "":
@@ -135,5 +159,5 @@ for key, value in judges.items():
     print(key, value)
 print("score: " + str(score))
 print("difficulty: {}".format(diff))
-print("grade: {}".format(rank))
+print("grade: {}{}".format(rank, passOrFail))
 print(text_data)
