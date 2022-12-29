@@ -1,4 +1,5 @@
-import os, io, pickle
+import os, io, pickle, datetime
+import pandas as pd
 from google.cloud import vision
 
 # used to filter text_data list to find song title easier
@@ -154,9 +155,8 @@ for FILE_NAME in allPicsList:
     passOrFail = ""
     if grayPresent == True:
         passOrFail = "-"
-
+    rank = rank + passOrFail
     # PRINT ALL RELEVANT INFORMATION BELOW
-
     if songTitle == "":
         print("---------------------No song title found!-----------------------")
     else:
@@ -166,4 +166,22 @@ for FILE_NAME in allPicsList:
         print(key, value)
     print("score: " + str(score))
     print("difficulty: {}".format(diff))
-    print("grade: {}{}".format(rank, passOrFail))
+    print("grade: {}".format(rank))
+
+    # appending data to Scores.csv 
+    data = {
+        'Date': [str(datetime.date.today())],
+        'File Name': [FILE_NAME],
+        'Song': [songTitle.title()],
+        'Difficulty': [diff],
+        'Perfect': [judges['perfect']],
+        'Great': [judges['great']],
+        'Good': [judges['good']],
+        'Bad': [judges['bad']],
+        'Miss': [judges['miss']],
+        'Max Combo': [judges['max_combo']],
+        'Score': [score],
+        'Grade': [rank.upper()]
+    }
+    df = pd.DataFrame(data)
+    df.to_csv('Scores.csv', mode='a', index=False, header=False)
