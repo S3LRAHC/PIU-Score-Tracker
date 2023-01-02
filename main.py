@@ -10,6 +10,8 @@ ignoredWords = ['ch4rley', 'beginner', 'my', 'best', 'machine', 'best', 'feel', 
 '[', '0/1', ']', 'notice', 'kronyork', 'lx', 'roamiro', 'ext', 'mach', 'piu', 'andamiro', 'mach', 'generation']
 
 # function to get difficulty value from text_data
+# CURRENT RECORDED DIFFICULTYS: 15-22
+# Do not make the range of difficulty's too large
 def getDiffNum(text_data):
     diffNum = 0
     for output in text_data:
@@ -34,18 +36,18 @@ def getRank(judges):
     return rank
 
 # authenticate service account with cloud vision API
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "bold-kit-371901-7d62ca675d64.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "bold-kit-371901-6900c40b30bb.json"
 
 # initialize client
 client = vision.ImageAnnotatorClient()
 
 # gather all image file names
-FOLDER_PATH = r"C:\Users\Charles\Documents\GitHub\PIU-Score-Tracker\pictures"
+FOLDER_PATH = os.path.abspath(os.getcwd())
 rightOrLeft = int(input("Extract scores from lsScores or rsScores? (0 for L/1 for R): "))
 if rightOrLeft == 0:
-    FOLDER_PATH = FOLDER_PATH + r"\lsScores"
+    FOLDER_PATH = FOLDER_PATH + r"\pictures\lsScores"
 else:
-    FOLDER_PATH = FOLDER_PATH + r"\rsScores"
+    FOLDER_PATH = FOLDER_PATH + r"\pictures\rsScores"
 allPicsList = os.listdir(FOLDER_PATH)
 
 # for loop to repeat text extraction process for all files in the folder
@@ -109,12 +111,17 @@ for FILE_NAME in allPicsList:
         judges["max_combo"] = text_data[scoreIndex - 1]
 
     # converts judges values to int. skips if value is not an int
+    # wordTo_ converts certain strings to integers when API reads wrong
+    wordTo0 = ['oot']
     for key, value in judges.items():
         try:
             judges[key] = int(value)
         except ValueError:
             # for future data processing, i will ignore -1 values if text cannot be extracted properly
-            judges[key] = -1
+            if value.casefold() in wordTo0:
+                judges[key] = 0
+            else:
+                judges[key] = -1
 
     # extract difficulty level
     diff = getDiffNum(text_data)
@@ -156,6 +163,7 @@ for FILE_NAME in allPicsList:
     if grayPresent == True:
         passOrFail = "-"
     rank = rank + passOrFail
+
     # PRINT ALL RELEVANT INFORMATION BELOW
     if songTitle == "":
         print("---------------------No song title found!-----------------------")
@@ -167,21 +175,22 @@ for FILE_NAME in allPicsList:
     print("score: " + str(score))
     print("difficulty: {}".format(diff))
     print("grade: {}".format(rank))
+    print(text_data)
 
     # appending data to Scores.csv 
-    data = {
-        'Date': [str(datetime.date.today())],
-        'File Name': [FILE_NAME],
-        'Song': [songTitle.title()],
-        'Difficulty': [diff],
-        'Perfect': [judges['perfect']],
-        'Great': [judges['great']],
-        'Good': [judges['good']],
-        'Bad': [judges['bad']],
-        'Miss': [judges['miss']],
-        'Max Combo': [judges['max_combo']],
-        'Score': [score],
-        'Grade': [rank.upper()]
-    }
-    df = pd.DataFrame(data)
-    df.to_csv('Scores.csv', mode='a', index=False, header=False)
+    # data = {
+    #     'Date': [str(datetime.date.today())],
+    #     'File Name': [FILE_NAME],
+    #     'Song': [songTitle.title()],
+    #     'Difficulty': [diff],
+    #     'Perfect': [judges['perfect']],
+    #     'Great': [judges['great']],
+    #     'Good': [judges['good']],
+    #     'Bad': [judges['bad']],
+    #     'Miss': [judges['miss']],
+    #     'Max Combo': [judges['max_combo']],
+    #     'Score': [score],
+    #     'Grade': [rank.upper()]
+    # }
+    # df = pd.DataFrame(data)
+    # df.to_csv('Scores.csv', mode='a', index=False, header=False)
