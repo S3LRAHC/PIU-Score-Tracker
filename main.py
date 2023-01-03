@@ -117,7 +117,7 @@ for FILE_NAME in allPicsList:
         try:
             judges[key] = int(value)
         except ValueError or TypeError:
-            # for future data processing, i will ignore -1 values if text cannot be extracted properly
+            # for future processing, i will ignore -1 values if text cannot be extracted properly
             if value.casefold() in wordTo0:
                 judges[key] = 0
             elif '.' in value:
@@ -182,19 +182,19 @@ for FILE_NAME in allPicsList:
     print(text_data)
 
     # appending data to Scores.csv 
-    # data = {
-    #     'Date': [str(datetime.date.today())],
-    #     'File Name': [FILE_NAME],
-    #     'Song': [songTitle.title()],
-    #     'Difficulty': [diff],
-    #     'Perfect': [judges['perfect']],
-    #     'Great': [judges['great']],
-    #     'Good': [judges['good']],
-    #     'Bad': [judges['bad']],
-    #     'Miss': [judges['miss']],
-    #     'Max Combo': [judges['max_combo']],
-    #     'Score': [score],
-    #     'Grade': [rank.upper()]
-    # }
-    # df = pd.DataFrame(data)
-    # df.to_csv('Scores.csv', mode='a', index=False, header=False)
+    data = {
+        'Date': [str(datetime.date.today())],
+        'File Name': [FILE_NAME],
+        'Song': [songTitle.title()],
+        'Difficulty': [diff],
+        'Perfect': [judges['perfect']],
+        'Great': [judges['great']],
+        'Good': [judges['good']],
+        'Bad': [judges['bad']],
+        'Miss': [judges['miss']],
+        'Max Combo': [judges['max_combo']],
+        'Score': [score],
+        'Grade': [rank.upper()]
+    }
+    df = pd.DataFrame(data)
+    df.to_csv('Scores.csv', mode='a', index=False, header=False)
