@@ -112,14 +112,18 @@ for FILE_NAME in allPicsList:
 
     # converts judges values to int. skips if value is not an int
     # wordTo_ converts certain strings to integers when API reads wrong
-    wordTo0 = ['oot']
+    wordTo0 = ['oot', 'fodb']
     for key, value in judges.items():
         try:
             judges[key] = int(value)
-        except ValueError:
+        except ValueError or TypeError:
             # for future data processing, i will ignore -1 values if text cannot be extracted properly
             if value.casefold() in wordTo0:
                 judges[key] = 0
+            elif '.' in value:
+                judges[key] = int(judges[key].replace('.', ''))
+            elif ',' in value:
+                judges[key] = int(judges[key].replace(',', ''))
             else:
                 judges[key] = -1
 
