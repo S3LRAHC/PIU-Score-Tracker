@@ -119,7 +119,7 @@ for FILE_NAME in allPicsList:
         except ValueError or TypeError:
             # for future processing, i will ignore -1 values if text cannot be extracted properly
             if value.casefold() in wordTo0:
-                judges[key] = 0
+                judges[key] = 0 
             elif '.' in value:
                 judges[key] = int(judges[key].replace('.', ''))
             elif ',' in value:
@@ -168,6 +168,19 @@ for FILE_NAME in allPicsList:
         passOrFail = "-"
     rank = rank + passOrFail
 
+    # checking if song was singles or doubles chart using green colour as threshold
+    # in the future i could combine this process with the one above
+    greenPresent = False
+    rValue = 55
+    gValue = 175
+    bValue = 165
+    for i in range(len(colour_data)):
+        if colour_data[i][0] < rValue and colour_data[i][1] > gValue and colour_data[i][2] < bValue:
+            greenPresent = True
+    chartType = "S"
+    if greenPresent == True:
+        chartType = "D"
+
     # PRINT ALL RELEVANT INFORMATION BELOW
     if songTitle == "":
         print("---------------------No song title found!-----------------------")
@@ -177,11 +190,12 @@ for FILE_NAME in allPicsList:
     for key, value in judges.items():
         print(key, value)
     print("score: " + str(score))
-    print("difficulty: {}".format(diff))
+    print("difficulty: {}{}".format(chartType, diff))
     print("grade: {}".format(rank))
     print(text_data)
 
     # appending data to Scores.csv 
+    diff = chartType + str(diff)
     data = {
         'Date': [str(datetime.date.today())],
         'File Name': [FILE_NAME],
