@@ -11,7 +11,6 @@ ignoredWords = ['ch4rley', 'beginner', 'my', 'best', 'machine', 'best', 'feel', 
 
 # function to get difficulty value from text_data
 # CURRENT RECORDED DIFFICULTYS: 15-22
-# Do not make the range of difficulty's too large
 def getDiffNum(text_data):
     diffNum = 0
     for output in text_data:
@@ -52,7 +51,6 @@ allPicsList = os.listdir(FOLDER_PATH)
 
 # for loop to repeat text extraction process for all files in the folder
 for FILE_NAME in allPicsList:
-    # read type is binary since an AI is reading the image, not a human
     with io.open(os.path.join(FOLDER_PATH, FILE_NAME), "rb") as image_file:
         content = image_file.read()
 
@@ -117,7 +115,7 @@ for FILE_NAME in allPicsList:
         try:
             judges[key] = int(value)
         except ValueError or TypeError:
-            # for future processing, i will ignore -1 values if text cannot be extracted properly
+            # if value cannot be read, -1 will be used
             if value.casefold() in wordTo0:
                 judges[key] = 0 
             elif '.' in value:
